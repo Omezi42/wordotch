@@ -8,11 +8,12 @@
 // GitHubにコミットして問題ありません（詳細はREADME.mdを参照）。
 
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyAloSYfsJso_8W2BozCI0F07QOfes5aKdo",
+  authDomain: "wa-dotti.firebaseapp.com",
+  databaseURL: "https://wa-dotti-default-rtdb.firebaseio.com",
+  projectId: "wa-dotti",
+  storageBucket: "wa-dotti.firebasestorage.app",
+  messagingSenderId: "335359533822",
+  appId: "1:335359533822:web:0871c2283515aee29d7baf",
+  measurementId: "G-5HZQBPQDPQ",
 };
