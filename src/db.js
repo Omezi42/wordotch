@@ -96,7 +96,37 @@ export function listenRoom(roomId, callback) {
 }
 
 export async function leaveRoom(roomId, playerId) {
+  const roomSnap = await get(ref(db, `rooms/${roomId}`));
+  if (!roomSnap.exists()) return;
+  const room = roomSnap.val();
+
+  const txResult = await runTransaction(ref(db, `rooms/${roomId}/playerOrder`), (currentOrder) => {
+    currentOrder = currentOrder || [];
+    return currentOrder.filter((id) => id !== playerId);
+  });
+  const newOrder = txResult.snapshot.val() || [];
+
   await remove(ref(db, `rooms/${roomId}/players/${playerId}`));
+
+  if (newOrder.length === 0) {
+    await remove(ref(db, `rooms/${roomId}`));
+    return;
+  }
+
+  const updates = {};
+  if (room.hostId === playerId) {
+    updates.hostId = newOrder[0];
+  }
+  const wasPlaying = room.status === "playing" && room.round;
+  const oyaLeft = wasPlaying && room.round.oyaId === playerId;
+  if (wasPlaying && (oyaLeft || newOrder.length < 3)) {
+    // 親が抜けた、または3人未満になった場合はラウンドを継続できないためロビーに戻す
+    updates.status = "lobby";
+    updates.round = null;
+  }
+  if (Object.keys(updates).length > 0) {
+    await update(ref(db, `rooms/${roomId}`), updates);
+  }
 }
 
 // ---- ゲーム進行 ----
@@ -193,6 +223,13 @@ export async function pickWinner(roomId, room, winnerId, winningWord) {
     const scoreRef = ref(db, `rooms/${roomId}/players/${winnerId}/score`);
     await runTransaction(scoreRef, (cur) => (cur || 0) + 1);
   }
+  await set(ref(db, `rooms/${roomId}/history/${room.round.number}`), {
+    number: room.round.number,
+    criteria: room.round.chosenCriteria,
+    oyaName: room.players[room.round.oyaId]?.name || "",
+    winningWord,
+    winnerName: winnerId ? (room.players[winnerId]?.name || "") : "",
+  });
 }
 
 export async function nextRound(roomId, room) {

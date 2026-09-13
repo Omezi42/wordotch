@@ -693,6 +693,10 @@ function renderReveal() {
   const isHost = room.hostId === state.playerId;
   const winnerName = round.winnerId ? room.players[round.winnerId]?.name : "（該当なし）";
 
+  const pastRounds = Object.values(room.history || {})
+    .filter((h) => h.number !== round.number)
+    .sort((a, b) => b.number - a.number);
+
   setScreen(`
     ${scoreboardHtml(room)}
     <div class="winner-banner">
@@ -713,6 +717,23 @@ function renderReveal() {
         </div>
       ` : `<p class="muted">ホストが次のラウンドを開始するのを待っています…</p>`}
     </div>
+    ${pastRounds.length ? `
+      <div class="panel">
+        <h2 style="margin-bottom:10px;">これまでのラウンド</h2>
+        <ul class="history-list">
+          ${pastRounds.map((h) => `
+            <li>
+              <div class="history-round">ラウンド${h.number}<span class="muted"> — 親：${esc(h.oyaName)}</span></div>
+              <div class="history-criteria">${esc(h.criteria)}</div>
+              <div class="history-result">
+                <span class="word-card used won">${esc(h.winningWord || "-")}</span>
+                <span class="muted">${esc(h.winnerName)} さんの勝ち</span>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      </div>
+    ` : ""}
   `);
 
   document.getElementById("next-round-btn")?.addEventListener("click", () => {
