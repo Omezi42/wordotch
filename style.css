@@ -67,6 +67,72 @@ main#app {
   margin-bottom: 16px;
 }
 
+.hero-panel {
+  text-align: center;
+  padding: 26px 20px 22px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #fff3d6, #fdf6e9);
+  border: 2px solid var(--sub);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.hero-icon { width: 76px; height: 76px; margin: 0 auto 8px; }
+.hero-icon svg { width: 100%; height: 100%; }
+.hero-title { margin: 4px 0 6px; font-size: 1.25rem; color: var(--accent-dark); }
+.hero-sub { margin: 0; color: #8a7a63; font-size: 0.9rem; }
+
+.rules-steps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 14px 0 18px;
+}
+.rule-step {
+  background: #fffaf0;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+}
+.rule-icon { width: 56px; height: 56px; margin: 0 auto 8px; }
+.rule-icon svg { width: 100%; height: 100%; }
+.rule-step h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--accent-dark);
+}
+.rule-step p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6f604a;
+  line-height: 1.5;
+}
+
+.role-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.role-chip {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fff7ea;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+}
+.role-icon { width: 36px; height: 36px; flex-shrink: 0; }
+.role-icon svg { width: 100%; height: 100%; }
+.role-chip strong { color: var(--accent-dark); font-size: 0.9rem; }
+.role-chip p { margin: 2px 0 0; font-size: 0.78rem; color: #6f604a; line-height: 1.4; }
+
+@media (max-width: 480px) {
+  .rules-steps { grid-template-columns: 1fr; }
+}
+
 h2 { margin-top: 0; }
 
 .field { margin-bottom: 14px; }

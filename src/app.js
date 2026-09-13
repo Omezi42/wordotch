@@ -29,6 +29,69 @@ function esc(str) {
   return d.innerHTML;
 }
 
+// ---------- ルール説明用イラスト（SVG） ----------
+
+const ICONS = {
+  cards: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="18" width="30" height="40" rx="4" transform="rotate(-12 10 18)" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2"/>
+      <rect x="20" y="14" width="30" height="40" rx="4" fill="#fff" stroke="var(--accent-dark)" stroke-width="2"/>
+      <circle cx="35" cy="26" r="4" fill="var(--accent)"/>
+      <line x1="27" y1="38" x2="43" y2="38" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="27" y1="44" x2="43" y2="44" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+    </svg>`,
+  duel: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="17" cy="26" rx="15" ry="12" fill="#fff" stroke="var(--accent-dark)" stroke-width="2"/>
+      <path d="M10 36 L6 46 L18 38 Z" fill="#fff" stroke="var(--accent-dark)" stroke-width="2"/>
+      <ellipse cx="47" cy="26" rx="15" ry="12" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2"/>
+      <path d="M54 36 L58 46 L46 38 Z" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2"/>
+      <text x="32" y="31" font-size="14" font-weight="800" fill="var(--accent-dark)" text-anchor="middle">VS</text>
+    </svg>`,
+  guess: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="26" r="16" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2"/>
+      <rect x="26" y="40" width="12" height="10" rx="2" fill="#fff" stroke="var(--accent-dark)" stroke-width="2"/>
+      <line x1="26" y1="46" x2="38" y2="46" stroke="var(--accent-dark)" stroke-width="2"/>
+      <path d="M32 14 a10 10 0 0 1 6 18 c-2 1.5 -2 3 -2 4 h-8 c0 -1 0 -2.5 -2 -4 a10 10 0 0 1 6 -18 Z" fill="#fff9e8"/>
+      <text x="32" y="50" font-size="0" ></text>
+      <path d="M20 50 q12 10 24 0" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>`,
+  trophy: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 14 h24 v14 a12 12 0 0 1 -24 0 Z" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2"/>
+      <path d="M20 16 h-8 a2 2 0 0 0 -2 2 c0 8 5 12 10 13" fill="none" stroke="var(--accent-dark)" stroke-width="2"/>
+      <path d="M44 16 h8 a2 2 0 0 1 2 2 c0 8 -5 12 -10 13" fill="none" stroke="var(--accent-dark)" stroke-width="2"/>
+      <rect x="28" y="40" width="8" height="8" fill="var(--accent-dark)"/>
+      <rect x="22" y="48" width="20" height="6" rx="2" fill="var(--accent)"/>
+      <circle cx="14" cy="10" r="2" fill="var(--accent)"/>
+      <circle cx="50" cy="8" r="2" fill="var(--accent)"/>
+      <circle cx="52" cy="18" r="1.6" fill="var(--sub)"/>
+    </svg>`,
+  crown: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 42 L10 24 L22 34 L32 18 L42 34 L54 24 L52 42 Z" fill="var(--sub)" stroke="var(--accent-dark)" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="12" y="42" width="40" height="8" rx="2" fill="var(--accent)" stroke="var(--accent-dark)" stroke-width="2"/>
+    </svg>`,
+  speech: `
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 16 h44 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 H26 l-10 10 v-10 h-6 a4 4 0 0 1 -4 -4 V20 a4 4 0 0 1 4 -4 Z" fill="#fff" stroke="var(--accent-dark)" stroke-width="2"/>
+      <circle cx="22" cy="29" r="2.5" fill="var(--accent)"/>
+      <circle cx="32" cy="29" r="2.5" fill="var(--accent)"/>
+      <circle cx="42" cy="29" r="2.5" fill="var(--accent)"/>
+    </svg>`,
+};
+
+function ruleStep(icon, title, desc) {
+  return `
+    <div class="rule-step">
+      <div class="rule-icon">${ICONS[icon]}</div>
+      <h3>${title}</h3>
+      <p>${desc}</p>
+    </div>
+  `;
+}
+
 function setScreen(html) {
   app.innerHTML = html;
 }
@@ -37,6 +100,12 @@ function setScreen(html) {
 
 function renderHome() {
   setScreen(`
+    <div class="hero-panel">
+      <div class="hero-icon">${ICONS.guess}</div>
+      <h2 class="hero-title">キジュンを読んで、みんなを驚かせろ！</h2>
+      <p class="hero-sub">親だけが知る「なぞのキジュン」を、言葉のバトルから読み解く会話ゲームです。</p>
+    </div>
+
     <div class="panel">
       <h2>友達と遊ぶ</h2>
       <div class="field">
@@ -58,12 +127,32 @@ function renderHome() {
       </div>
     </div>
     ${ui.errorMsg ? `<p class="error-msg">${esc(ui.errorMsg)}</p>` : ""}
+
     <div class="panel">
-      <h2 style="margin-bottom:6px;">ルール早見表</h2>
-      <p class="muted">
-        3〜8人で遊ぶ会話ゲームです。親が秘密の「キジュン」を選び、みんなが言うワードをキジュンに沿って判定していきます。
-        最後にみんなで「親が選びそうな優勝ワード」を予想し、当てた人が勝ちです。
-      </p>
+      <h2 style="margin-bottom:4px;">遊び方は4ステップ</h2>
+      <p class="muted" style="margin-top:0;">3〜8人向け。1ラウンドはだいたい3〜5分です。</p>
+      <div class="rules-steps">
+        ${ruleStep("cards", "① 親を決めてカードを配る", "親には2枚のカードが配られます。カードの裏には「キジュン」が書かれていて、親はそれを見て今回使う方をこっそり選びます。")}
+        ${ruleStep("duel", "② ワードを出し合って判定", "親がまず1つワードを発表。あとはみんな自由にワードを出していき、親がキジュンに沿って「今のチャンピオン vs 新しいワード」を判定します。")}
+        ${ruleStep("guess", "③ 優勝ワードをみんなで予想", "頃合いを見て親が調査を打ち切り、決選フェイズへ。まだ出ていないワードの中から「親が選びそうな1つ」をこっそり考えて、せーので発表します。")}
+        ${ruleStep("trophy", "④ 親が優勝ワードを選んで発表", "親が一番ふさわしいと思ったワードを選び、それを出した人の勝ち。最後にキジュンを公開して、答え合わせをみんなで楽しみましょう。")}
+      </div>
+      <div class="role-row">
+        <div class="role-chip">
+          <span class="role-icon">${ICONS.crown}</span>
+          <div>
+            <strong>親</strong>
+            <p>キジュンを選び、ワード対決を判定する審判役。ラウンドごとに持ち回りです。</p>
+          </div>
+        </div>
+        <div class="role-chip">
+          <span class="role-icon">${ICONS.speech}</span>
+          <div>
+            <strong>子</strong>
+            <p>ワードを出して親の判定を受ける挑戦者役。決選フェイズでは予想もします。</p>
+          </div>
+        </div>
+      </div>
     </div>
   `);
 
