@@ -446,7 +446,7 @@ function renderInvestigate() {
         ` : `<p class="muted">新しいワードが出てくるのを待っています…</p>`}
         ${judgedEntries.length ? `
           <h3>これまでの判定</h3>
-          ${judgedEntries.map(([, v]) => `
+          ${judgedEntries.slice().reverse().map(([, v]) => `
             <div class="queue-item judged ${v.status}">
               <span class="word">${esc(v.word)}（${esc(v.playerName)}）</span>
               <span class="result-badge ${v.status}">${v.status === "won" ? "勝ち" : "負け"}</span>
