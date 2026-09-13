@@ -351,6 +351,8 @@ button.small { padding: 8px 12px; font-size: 0.85rem; }
   font-weight: 700;
 }
 .final-entry-list li:hover { border-color: var(--accent); }
+.final-entry-list.readonly li { cursor: default; }
+.final-entry-list.readonly li:hover { border-color: var(--line); }
 .final-entry-list li .word { font-size: 1.2rem; }
 
 .winner-banner {

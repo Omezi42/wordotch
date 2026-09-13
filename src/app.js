@@ -588,7 +588,18 @@ function renderFinal() {
       <h2>決選フェイズ</h2>
       ${survivorHtml}
       <p class="muted">これまでに出ていないワードの中から、親が選びそうな「優勝ワード」を1つ予想して送りましょう。</p>
-      ${mySubmitted ? `
+      ${round.finalRevealed ? `
+        <h3>みんなの予想</h3>
+        <ul class="final-entry-list readonly">
+          ${Object.entries(entries).map(([pid, word]) => `
+            <li>
+              <span class="word">${esc(word)}</span>
+              <span class="muted"> — ${esc(room.players[pid]?.name || "")}${pid === state.playerId ? "（あなた）" : ""}</span>
+            </li>
+          `).join("")}
+        </ul>
+        <p class="muted">親が優勝ワードを選んでいます…</p>
+      ` : mySubmitted ? `
         <div class="champion-box">
           <div class="muted">あなたの予想</div>
           <div class="champion-word">${esc(mySubmitted)}</div>
@@ -613,7 +624,7 @@ function renderFinal() {
     </div>
   `);
 
-  if (!mySubmitted) {
+  if (!mySubmitted && !round.finalRevealed) {
     const input = document.getElementById("final-input");
     input.addEventListener("input", (e) => { ui.finalInput = e.target.value; });
     const doSubmit = async (word) => {
