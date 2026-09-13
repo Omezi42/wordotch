@@ -22,6 +22,7 @@ const ui = {
   wordInput: "",
   finalInput: "",
   startingOyaId: null,
+  usedWordsFilter: "all", // "all" | "won"
 };
 
 function esc(str) {
@@ -297,15 +298,43 @@ function scoreboardHtml(room) {
   `;
 }
 
+function wonWordsSet(round) {
+  const won = new Set();
+  const queuedWords = new Set(Object.values(round.queue || {}).map((v) => v.word));
+  Object.values(round.queue || {}).forEach((v) => { if (v.status === "won") won.add(v.word); });
+  // キューを経由していない使用済みワード＝ラウンド開始時に親が選んだ最初のチャンピオン
+  Object.keys(round.usedWords || {}).forEach((w) => { if (!queuedWords.has(w)) won.add(w); });
+  return won;
+}
+
 function usedWordsHtml(round) {
-  const used = Object.keys(round.usedWords || {});
-  if (used.length === 0) return "";
+  const all = Object.keys(round.usedWords || {});
+  if (all.length === 0) return "";
+  const won = wonWordsSet(round);
+  const showWonOnly = ui.usedWordsFilter === "won";
+  const list = showWonOnly ? all.filter((w) => won.has(w)) : all;
   return `
     <div class="used-words">
-      <div>使用済みワード：</div>
-      <div class="word-row">${used.map((w) => `<span class="word-card used">${esc(w)}</span>`).join("")}</div>
+      <div class="btn-row" style="align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span>使用済みワード：</span>
+        <button id="used-words-filter-btn" class="ghost small" type="button">
+          ${showWonOnly ? "すべて表示" : "勝ったワードだけ表示"}
+        </button>
+      </div>
+      <div class="word-row">
+        ${list.length
+          ? list.map((w) => `<span class="word-card used ${won.has(w) ? "won" : ""}">${esc(w)}${won.has(w) ? " 🏆" : ""}</span>`).join("")
+          : '<span class="muted">まだ勝ったワードはありません</span>'}
+      </div>
     </div>
   `;
+}
+
+function bindUsedWordsToggle() {
+  document.getElementById("used-words-filter-btn")?.addEventListener("click", () => {
+    ui.usedWordsFilter = ui.usedWordsFilter === "won" ? "all" : "won";
+    render();
+  });
 }
 
 function render() {
@@ -478,6 +507,7 @@ function renderInvestigate() {
     document.getElementById("end-investigate-btn").addEventListener("click", () => {
       endInvestigation(state.roomId);
     });
+    bindUsedWordsToggle();
     return;
   }
 
@@ -533,6 +563,7 @@ function renderInvestigate() {
   document.querySelectorAll("[data-quickword]").forEach((elWord) => {
     elWord.addEventListener("click", () => doSubmit(elWord.dataset.quickword));
   });
+  bindUsedWordsToggle();
 }
 
 // ---------- フェイズ：決選 ----------
@@ -585,6 +616,7 @@ function renderFinal() {
         pickWinner(state.roomId, room, li.dataset.winner, li.dataset.word);
       });
     });
+    bindUsedWordsToggle();
     return;
   }
 
@@ -650,6 +682,7 @@ function renderFinal() {
       elWord.addEventListener("click", () => doSubmit(elWord.dataset.quickword));
     });
   }
+  bindUsedWordsToggle();
 }
 
 // ---------- フェイズ：結果発表 ----------

@@ -245,6 +245,13 @@ button.small { padding: 8px 12px; font-size: 0.85rem; }
   text-decoration: line-through;
   cursor: not-allowed;
 }
+.word-card.used.won {
+  opacity: 0.9;
+  text-decoration: none;
+  background: #fff3d6;
+  border-color: var(--sub);
+  color: var(--accent-dark);
+}
 .word-card.selected {
   background: var(--accent);
   color: #fff;
