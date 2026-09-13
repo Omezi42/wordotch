@@ -53,22 +53,30 @@ export async function createRoom(playerName) {
 export async function joinRoom(roomId, playerName) {
   roomId = roomId.trim().toUpperCase();
   const playerId = getPlayerId();
-  const roomRef = ref(db, `rooms/${roomId}`);
-  const snap = await get(roomRef);
-  if (!snap.exists()) {
+  const roomSnap = await get(ref(db, `rooms/${roomId}`));
+  if (!roomSnap.exists()) {
     throw new Error("その部屋番号は見つかりませんでした");
   }
-  const room = snap.val();
-  if (!room.players || !room.players[playerId]) {
-    const order = room.playerOrder ? room.playerOrder.length : 0;
-    await update(ref(db, `rooms/${roomId}/players/${playerId}`), {
-      name: playerName, score: 0, connected: true, joinedOrder: order,
-    });
-    const newOrder = [...(room.playerOrder || []), playerId];
-    await set(ref(db, `rooms/${roomId}/playerOrder`), newOrder);
-  } else {
+
+  // 複数人がほぼ同時に参加しても取りこぼさないよう、
+  // playerOrderへの追加はトランザクションで行う
+  const orderRef = ref(db, `rooms/${roomId}/playerOrder`);
+  const txResult = await runTransaction(orderRef, (currentOrder) => {
+    currentOrder = currentOrder || [];
+    if (!currentOrder.includes(playerId)) currentOrder.push(playerId);
+    return currentOrder;
+  });
+  const order = txResult.snapshot.val() || [];
+  const joinedOrder = order.indexOf(playerId);
+
+  const existingPlayerSnap = await get(ref(db, `rooms/${roomId}/players/${playerId}`));
+  if (existingPlayerSnap.exists()) {
     await update(ref(db, `rooms/${roomId}/players/${playerId}`), {
       name: playerName, connected: true,
+    });
+  } else {
+    await set(ref(db, `rooms/${roomId}/players/${playerId}`), {
+      name: playerName, score: 0, connected: true, joinedOrder,
     });
   }
   attachPresence(roomId, playerId);
@@ -93,9 +101,10 @@ export async function leaveRoom(roomId, playerId) {
 
 // ---- ゲーム進行 ----
 
-export async function startGame(roomId, room) {
+export async function startGame(roomId, room, oyaId) {
   await update(ref(db, `rooms/${roomId}`), { status: "playing" });
-  await startRound(roomId, room, 1, room.playerOrder[0]);
+  const startingOyaId = oyaId && room.players[oyaId] ? oyaId : room.playerOrder[0];
+  await startRound(roomId, room, 1, startingOyaId);
 }
 
 export async function startRound(roomId, room, roundNumber, oyaId) {

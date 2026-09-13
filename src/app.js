@@ -21,6 +21,7 @@ const ui = {
   championWord: null,
   wordInput: "",
   finalInput: "",
+  startingOyaId: null,
 };
 
 function esc(str) {
@@ -217,6 +218,10 @@ function renderLobby() {
   const players = room.playerOrder.map((id) => ({ id, ...room.players[id] }));
   const isHost = room.hostId === state.playerId;
 
+  if (!ui.startingOyaId || !room.players[ui.startingOyaId]) {
+    ui.startingOyaId = room.hostId;
+  }
+
   setScreen(`
     <div class="panel center">
       <h2>部屋番号</h2>
@@ -234,6 +239,13 @@ function renderLobby() {
         `).join("")}
       </ul>
       ${isHost ? `
+        <h3 style="margin-bottom:6px;">最初の親を選ぶ</h3>
+        <p class="muted" style="margin-top:0;">指定しなければあなた（ホスト）が最初の親になります。2ラウンド目以降は自動で持ち回りです。</p>
+        <div class="word-row">
+          ${players.map((p) => `
+            <span class="word-card ${ui.startingOyaId === p.id ? "selected" : ""}" data-oya="${p.id}">${esc(p.name)}</span>
+          `).join("")}
+        </div>
         <div class="btn-row">
           <button id="start-btn" ${players.length < 3 ? "disabled" : ""}>ゲーム開始</button>
         </div>
@@ -246,8 +258,14 @@ function renderLobby() {
   `);
 
   if (isHost) {
+    document.querySelectorAll("[data-oya]").forEach((elP) => {
+      elP.addEventListener("click", () => {
+        ui.startingOyaId = elP.dataset.oya;
+        render();
+      });
+    });
     document.getElementById("start-btn")?.addEventListener("click", () => {
-      startGame(state.roomId, room);
+      startGame(state.roomId, room, ui.startingOyaId);
     });
   }
   document.getElementById("leave-btn").addEventListener("click", async () => {
@@ -293,6 +311,12 @@ function usedWordsHtml(round) {
 function render() {
   const room = state.room;
   if (!room) { renderHome(); return; }
+  if (!room.playerOrder || !room.players) {
+    // 複数人がほぼ同時に参加した瞬間など、ごく短時間だけ
+    // Firebaseから不完全なスナップショットが届くことがあるための保険
+    setScreen('<p class="loading">読み込み中...</p>');
+    return;
+  }
   if (room.status === "lobby" || !room.round) { renderLobby(); return; }
 
   const phase = room.round.phase;
