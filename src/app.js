@@ -425,8 +425,17 @@ function renderInvestigate() {
     </div>
   `;
 
+  const current = pendingEntries[0];
+  const judgingHtml = current ? `
+    <h3>親が今判定している勝負</h3>
+    <div class="vs-row">
+      <div class="vs-card">${esc(champion.word)}<div class="muted" style="font-weight:400;">(現チャンピオン)</div></div>
+      <div class="vs-versus">VS</div>
+      <div class="vs-card">${esc(current[1].word)}<div class="muted" style="font-weight:400;">${esc(current[1].playerName)}</div></div>
+    </div>
+  ` : "";
+
   if (isOya) {
-    const current = pendingEntries[0];
     setScreen(`
       ${scoreboardHtml(room)}
       <div class="panel">
@@ -480,6 +489,7 @@ function renderInvestigate() {
     ${scoreboardHtml(room)}
     <div class="panel">
       ${championHtml}
+      ${judgingHtml}
       <p class="muted">キジュンに合いそうなワードを自由に投げかけましょう。親が判定します。</p>
       <h3>手札から出す</h3>
       <div class="word-row">
