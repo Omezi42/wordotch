@@ -373,17 +373,6 @@ button.small { padding: 8px 12px; font-size: 0.85rem; }
 .winner-banner .win-word { font-size: 2rem; font-weight: 900; color: var(--accent-dark); }
 .winner-banner .win-name { font-size: 1.1rem; margin-top: 6px; }
 
-.history-list { list-style: none; padding: 0; margin: 0; }
-.history-list li {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  margin-bottom: 8px;
-}
-.history-round { font-weight: 700; font-size: 0.85rem; color: var(--accent-dark); margin-bottom: 4px; }
-.history-criteria { font-size: 0.85rem; color: #6f604a; margin-bottom: 8px; }
-.history-result { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
 .center { text-align: center; }
 .muted { color: #8a7a63; font-size: 0.9rem; }
 .error-msg { color: var(--bad); font-size: 0.85rem; margin-top: 6px; }

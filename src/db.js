@@ -223,13 +223,6 @@ export async function pickWinner(roomId, room, winnerId, winningWord) {
     const scoreRef = ref(db, `rooms/${roomId}/players/${winnerId}/score`);
     await runTransaction(scoreRef, (cur) => (cur || 0) + 1);
   }
-  await set(ref(db, `rooms/${roomId}/history/${room.round.number}`), {
-    number: room.round.number,
-    criteria: room.round.chosenCriteria,
-    oyaName: room.players[room.round.oyaId]?.name || "",
-    winningWord,
-    winnerName: winnerId ? (room.players[winnerId]?.name || "") : "",
-  });
 }
 
 export async function nextRound(roomId, room) {
