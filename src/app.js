@@ -687,11 +687,26 @@ function renderFinal() {
 
 // ---------- フェイズ：結果発表 ----------
 
+function reconstructBattles(round) {
+  const queueEntries = Object.entries(round.queue || {}).sort((a, b) => a[0].localeCompare(b[0]));
+  const queuedWords = new Set(queueEntries.map(([, v]) => v.word));
+  const initialWord = Object.keys(round.usedWords || {}).find((w) => !queuedWords.has(w));
+  let championWord = initialWord || "";
+  const battles = [];
+  for (const [, v] of queueEntries) {
+    battles.push({ championWord, challengerWord: v.word, challengerName: v.playerName, result: v.status });
+    if (v.status === "won") championWord = v.word;
+  }
+  return battles;
+}
+
 function renderReveal() {
   const room = state.room;
   const round = room.round;
   const isHost = room.hostId === state.playerId;
   const winnerName = round.winnerId ? room.players[round.winnerId]?.name : "（該当なし）";
+  const battles = reconstructBattles(round).reverse();
+  const finalEntries = Object.entries(round.finalEntries || {});
 
   setScreen(`
     ${scoreboardHtml(room)}
@@ -713,6 +728,32 @@ function renderReveal() {
         </div>
       ` : `<p class="muted">ホストが次のラウンドを開始するのを待っています…</p>`}
     </div>
+    ${finalEntries.length ? `
+      <div class="panel">
+        <h2 style="margin-bottom:10px;">みんなの決選予想</h2>
+        <ul class="final-entry-list readonly">
+          ${finalEntries.map(([pid, word]) => `
+            <li>
+              <span class="word">${esc(word)}</span>
+              <span class="muted"> — ${esc(room.players[pid]?.name || "")}${pid === round.winnerId ? " 🏆" : ""}</span>
+            </li>
+          `).join("")}
+        </ul>
+      </div>
+    ` : ""}
+    ${battles.length ? `
+      <div class="panel">
+        <h2 style="margin-bottom:10px;">調査フェイズの判定を振り返る</h2>
+        <p class="muted" style="margin-top:0;">このキジュンで、どっちが勝ったか答え合わせしてみましょう。</p>
+        ${battles.map((b) => `
+          <div class="vs-row" style="margin:10px 0;">
+            <div class="vs-card" style="${b.result === "won" ? "opacity:.5;text-decoration:line-through;" : ""}">${esc(b.championWord)}</div>
+            <div class="vs-versus">VS</div>
+            <div class="vs-card" style="${b.result === "lost" ? "opacity:.5;text-decoration:line-through;" : ""}">${esc(b.challengerWord)}<div class="muted" style="font-weight:400;">${esc(b.challengerName)}</div></div>
+          </div>
+        `).join("")}
+      </div>
+    ` : ""}
   `);
 
   document.getElementById("next-round-btn")?.addEventListener("click", () => {
