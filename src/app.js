@@ -535,12 +535,21 @@ function renderFinal() {
   const entries = round.finalEntries || {};
   const allSubmitted = children.every((id) => entries[id]);
 
+  const survivorHtml = `
+    <div class="champion-box">
+      <div class="muted">調査フェイズを勝ち残ったワード</div>
+      <div class="champion-word">${esc(round.champion.word)}</div>
+      <div class="champion-owner">${esc(round.champion.ownerName)}</div>
+    </div>
+  `;
+
   if (isOya) {
     setScreen(`
       ${scoreboardHtml(room)}
       <div class="panel">
         <p class="secret-note">キジュン（あなただけに見えています）：<strong>${esc(round.chosenCriteria)}</strong></p>
         <h2>決選フェイズ</h2>
+        ${survivorHtml}
         <p class="muted">全員が「優勝ワード」を予想して入力中です。（${Object.keys(entries).length}/${children.length}人 提出済み）</p>
         ${usedWordsHtml(round)}
         ${!round.finalRevealed ? `
@@ -577,6 +586,7 @@ function renderFinal() {
     ${scoreboardHtml(room)}
     <div class="panel">
       <h2>決選フェイズ</h2>
+      ${survivorHtml}
       <p class="muted">これまでに出ていないワードの中から、親が選びそうな「優勝ワード」を1つ予想して送りましょう。</p>
       ${mySubmitted ? `
         <div class="champion-box">
